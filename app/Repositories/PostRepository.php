@@ -42,8 +42,7 @@ class PostRepository extends BaseRepository
                 'status' => $defaultStatus
                             ? Post::PENDING_POST_STATUS
                             : $request->status
-            ]
-        ));
+        ]));
     }
 
     /**
@@ -51,12 +50,15 @@ class PostRepository extends BaseRepository
      * @param $request
      * @return mixed
      */
-    public function updatePost($postId, $request)
+    public function updatePost($post, $request)
     {
-        $this->model->update($postId, array_merge($request->validated(), [
+        $thumbnail = !empty($request->file('thumbnail'))
+                     ? $request->file('thumbnail')->store('thumbnails')
+                     : $post->thumbnail;
+        $this->model->update([$post->id], array_merge($request->validated(), [
                 'user_id' => auth()->user()->id,
-                'thumbnail' => request()->file('thumbnail')->store('thumbnails')]
-        ));
+                'thumbnail' => $thumbnail
+        ]));
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequestForm;
 use App\Models\Post;
 use App\Repositories\PostRepository;
+use Clockwork\Request\Request;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -21,7 +22,7 @@ class BaseAdminPostController extends Controller
      */
     protected $repository = null;
 
-    public function __construct(PostRequestForm $request, PostRepository $repository) {
+    public function __construct(Request $request, PostRepository $repository) {
         $this->request = $request;
         $this->repository = $repository;
     }
@@ -43,10 +44,10 @@ class BaseAdminPostController extends Controller
         return view('admin.posts.create');
     }
 
-    public function store()
+    public function store(PostRequestForm $request)
     {
         try {
-            $this->repository->createNewPost($this->request, false);
+            $this->repository->createNewPost($request, false);
         } catch (Exception $exception) {
             Log::error($exception);
             return back()->withError($exception->getMessage())->withInput();
@@ -60,10 +61,10 @@ class BaseAdminPostController extends Controller
         return view('admin.posts.edit', ['post' => $post]);
     }
 
-    public function update(Post $post)
+    public function update(PostRequestForm $request, Post $post)
     {
         try {
-            $this->repository->updatePost($post->id, $this->request);
+            $this->repository->updatePost($post->id, $request);
             return back()->with('success', 'Post Updated!');
         } catch (Exception $exception) {
             Log::error($exception);

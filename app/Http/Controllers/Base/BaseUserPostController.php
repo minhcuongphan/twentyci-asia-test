@@ -7,6 +7,7 @@ use App\Http\Requests\PostRequestForm;
 use App\Models\Post;
 use App\Repositories\PostRepository;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class BaseUserPostController extends Controller
@@ -21,14 +22,14 @@ class BaseUserPostController extends Controller
      */
     protected $repository = null;
 
-    public function __construct(PostRequestForm $request, PostRepository $repository) {
+    public function __construct(Request $request, PostRepository $repository)
+    {
         $this->request = $request;
         $this->repository = $repository;
     }
 
     public function index()
     {
-        dd(222);
         try {
             $posts = $this->repository->getAllPosts(request(['search', 'author']), true);
         } catch (Exception $exception) {
@@ -49,10 +50,10 @@ class BaseUserPostController extends Controller
         return view('users.posts.create');
     }
 
-    public function store()
+    public function store(PostRequestForm $request)
     {
         try {
-            $this->repository->createNewPost($this->request, true);
+            $this->repository->createNewPost($request, true);
         } catch (Exception $exception) {
             Log::error($exception);
             return back()->withError($exception->getMessage())->withInput();
@@ -78,10 +79,10 @@ class BaseUserPostController extends Controller
         return view('users.posts.edit', compact('post'));
     }
 
-    public function update(Post $post)
+    public function update(PostRequestForm $request, Post $post)
     {
         try {
-            $this->repository->updatePost($post->id, $this->request);
+            $this->repository->updatePost($post, $request);
             return back()->with('success', 'Post Updated!');
         } catch (Exception $exception) {
             Log::error($exception);
