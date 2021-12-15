@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-abstract class BaseRepository
+abstract class BaseRepository implements RepositoryInterface
 {
     protected $model;
 
@@ -43,6 +43,7 @@ abstract class BaseRepository
     public function update($id, $attributes = [])
     {
         $result = $this->find($id);
+
         if ($result) {
             $result->update($attributes);
             return $result;

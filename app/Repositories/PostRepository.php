@@ -23,7 +23,7 @@ class PostRepository extends BaseRepository
     {
         return $this->model->select("*")
                     ->OfPostFilter($request, $isApprovedStatusFilter)
-                    ->paginate(5)
+                    ->paginate(6)
                     ->withQueryString();
     }
 
@@ -34,7 +34,7 @@ class PostRepository extends BaseRepository
      */
     public function createNewPost($request, $defaultStatus)
     {
-        $this->model->create(array_merge($request->validated(), [
+        $this->create(array_merge($request->validated(), [
                 'user_id' => auth()->user()->id,
                 'thumbnail' => request()->file('thumbnail')
                                 ? request()->file('thumbnail')->store('thumbnails')
@@ -46,16 +46,17 @@ class PostRepository extends BaseRepository
     }
 
     /**
-     * @param $postId
      * @param $request
+     * @param $post
      * @return mixed
      */
-    public function updatePost($post, $request)
+    public function updatePost($request, $post)
     {
         $thumbnail = !empty($request->file('thumbnail'))
-                     ? $request->file('thumbnail')->store('thumbnails')
-                     : $post->thumbnail;
-        $this->model->update([$post->id], array_merge($request->validated(), [
+                ? $request->file('thumbnail')->store('thumbnails')
+                : $post->thumbnail;
+
+        $this->update($post->id, array_merge($request->validated(), [
                 'user_id' => auth()->user()->id,
                 'thumbnail' => $thumbnail
         ]));

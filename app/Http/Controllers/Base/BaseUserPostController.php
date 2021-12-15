@@ -7,24 +7,17 @@ use App\Http\Requests\PostRequestForm;
 use App\Models\Post;
 use App\Repositories\PostRepository;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class BaseUserPostController extends Controller
 {
     /**
-     * @var Request
-     */
-    protected $request = null;
-
-    /**
      * @var PostRepository
      */
     protected $repository = null;
 
-    public function __construct(Request $request, PostRepository $repository)
+    public function __construct(PostRepository $repository)
     {
-        $this->request = $request;
         $this->repository = $repository;
     }
 
@@ -82,7 +75,7 @@ class BaseUserPostController extends Controller
     public function update(PostRequestForm $request, Post $post)
     {
         try {
-            $this->repository->updatePost($post, $request);
+            $this->repository->updatePost($request, $post);
             return back()->with('success', 'Post Updated!');
         } catch (Exception $exception) {
             Log::error($exception);
